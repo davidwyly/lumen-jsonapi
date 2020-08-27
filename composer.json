@@ -1,0 +1,27 @@
+{
+  "name": "davidwyly/lumen-toolkit",
+  "description": "Extension toolkit for Lumen",
+  "keywords": [
+    "lumen",
+    "toolkit",
+    "extension"
+  ],
+  "type":  "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "David Wyly",
+      "email": "david.wyly@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "laravel/lumen-framework": "^7.0",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "LumenToolkit\\": "src/LumenToolkit/"
+    }
+  }
+}
