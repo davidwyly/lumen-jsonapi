@@ -9,7 +9,6 @@ node_modules/
 npm-debug.log
 package-lock.json
 package.json
-c3.php
 .idea/*
 
 # Laravel 5 & Lumen specific
@@ -18,7 +17,6 @@ public/hot
 storage/framework/cache
 .env.*.php
 .env.php
-.env
 .phpunit.result.cache
 Homestead.yaml
 Homestead.json
