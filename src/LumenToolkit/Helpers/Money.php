@@ -19,20 +19,4 @@ class Money
     {
         return $symbol . number_format((float)$value, $decimals, $decimal_point, $thousands_sep);
     }
-
-    /**
-     * @param float  $value
-     * @param string $currency_code
-     *
-     * @return Money
-     * @throws Exception
-     */
-    public static function float(float $value, string $currency_code): Money
-    {
-
-    }
-
-    public function __construct(int $cents, $currency_code)
-    {
-    }
 }

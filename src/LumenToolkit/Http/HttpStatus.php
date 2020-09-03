@@ -1,8 +1,8 @@
 <?php
 
-namespace LumenToolkit\Helpers;
+namespace LumenToolkit\Http;
 
-class HttpStatus
+class Status
 {
     /**
      * Informational 1xx

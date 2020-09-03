@@ -2,14 +2,13 @@
 
 namespace LumenToolkit\Helpers;
 
-use LumenToolkit\Exceptions\InvalidCallableException;
 use Exception;
 use Reflection;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
 
-class Parse
+class Str
 {
     /**
      * @param string $haystack
@@ -23,6 +22,19 @@ class Parse
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param string $string1
+     * @param string $string2
+     *
+     * @return bool
+     */
+    public static function looselyMatches(string $string1, string $string2): bool
+    {
+        $string1 = mb_strtolower(trim(self::clean($string1)));
+        $string2 = mb_strtolower(trim(self::clean($string2)));
+        return ($string1 == $string2);
     }
 
     /**
@@ -50,19 +62,19 @@ class Parse
 
     /**
      * @param int         $length
-     * @param string|null $characters
+     * @param string|null $character_set
      *
      * @return string
      */
-    public static function getRandom(int $length, string $characters = null): string
+    public static function generateRandom(int $length, string $character_set = null): string
     {
-        if (is_null($characters)) {
-            $characters = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+        if (is_null($character_set)) {
+            $character_set = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
         }
         $string           = [];
-        $character_length = strlen($characters);
+        $character_length = strlen($character_set);
         for ($i = 0; $i < $length; $i++) {
-            $string[] = $characters[mt_rand(0, $character_length - 1)];
+            $string[] = $character_set[mt_rand(0, $character_length - 1)];
         }
         return implode($string);
     }
@@ -71,7 +83,6 @@ class Parse
      * @param string $text
      *
      * @return string
-     * @throws Exception
      */
     public static function clean(string $text): string
     {
@@ -97,7 +108,7 @@ class Parse
         ];
         $result = preg_replace(array_keys($utf8), array_values($utf8), $text);
         if (is_null($result)) {
-            throw new Exception("Replace operation failed");
+            return $text;
         }
         return $result;
     }

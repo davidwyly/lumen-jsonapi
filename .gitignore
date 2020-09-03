@@ -1,0 +1,32 @@
+deployment/values.dev.yaml
+deployment/values.dev.yml
+profiler/*
+.idea
+c3.php
+.env
+storage/erds/*.bak
+node_modules/
+npm-debug.log
+package-lock.json
+package.json
+c3.php
+.idea/*
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+storage/framework/cache
+.env.*.php
+.env.php
+.env
+.phpunit.result.cache
+Homestead.yaml
+Homestead.json
+vendor/
+
+# Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
+.rocketeer/
+.DS_store
+
+# Composer Vendor Ignore
+**/vendor

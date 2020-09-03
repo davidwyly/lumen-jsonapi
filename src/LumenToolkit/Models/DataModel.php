@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace LumenToolkit\Models;
 
-use LumenToolkit\Helpers\HttpStatus;
+use LumenToolkit\Http\Status;
 use Closure;
-use Eloquent;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 use Generator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Query\Builder as Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -24,7 +25,7 @@ use ReflectionException;
 /**
  * @method static $this        make(array $attributes = [])
  * @method static $this        withGlobalScope($identifier, Closure | Scope $scope)
- * @method static $this        withoutGlobalScope(\Scope | string $scope)
+ * @method static $this        withoutGlobalScope(Scope | string $scope)
  * @method static $this        withoutGlobalScopes(array | null $scopes = null)
  * @method static array        removedScopes()
  * @method static $this        whereKey($id)
@@ -32,21 +33,21 @@ use ReflectionException;
  * @method static Builder      orWhere($column, $operator = null, $value = null)
  * @method static Collection   hydrate(array $items)
  * @method static Collection   fromQuery($query, $bindings = [])
- * @method static Model|Collection|null|DataModel|$this   find($id, $columns = [])
+ * @method static Model|Collection|null|DataModel|$this    find($id, $columns = [])
  * @method static Collection   indMany($ids, $columns = [])
- * @method static Model|Collection|$this                                      findOrFail($id, $columns = [])
+ * @method static Model|Collection|$this    findOrFail($id, $columns = [])
  * @method static Model|$this  findOrNew($id, $columns = [])
  * @method static Model        firstOrCreate(array $attributes, array $values = [])
  * @method static Model        updateOrCreate(array $attributes, array $values = [])
  * @method static Model|mixed  firstOrFail($columns = [])
  * @method static Model|mixed  firstOr($columns = [], Closure | null $callback = null)
- * @method static value($column)
+ * @method static              value($column)
  * @method static Collection   get($columns = [])
  * @method static Model[]      getModels($columns = [])
  * @method static array        eagerLoadRelations(array $models)
  * @method static Generator    cursor()
  * @method static Collection   pluck($column, $key = null)
- * @method static LengthAwarePaginator  paginate($perPage = null, $columns = [], $pageName = 'page', $page = null)
+ * @method static LengthAwarePaginator    paginate($perPage = null, $columns = [], $pageName = 'page', $page = null)
  * @method static Paginator    simplePaginate($perPage = null, $columns = [], $pageName = 'page', $page = null)
  * @method static Model|$this  create(array $attributes = [])
  * @method static Model|$this  forceCreate(array $attributes)
@@ -69,7 +70,7 @@ use ReflectionException;
  * @method static mixed        when($value, callable $callback, callable $default = null)
  * @method static Builder      tap(Closure $callback)
  * @method static mixed        unless($value, callable $callback, callable $default = null)
- * @method static Builder has(string $rel, string $op = '>=', int $count = 1, string $bool = 'and', Closure $cb = null)
+ * @method static Builder      has(string $rel, string $op = '>=', int $count = 1, string $bool = 'and', Closure $cb = null)
  * @method static Builder      orHas(string $relation, string $operator = '>=', int $count = 1)
  * @method static Builder      doesntHave(string $relation, string $boolean = 'and', Closure $callback = null)
  * @method static Builder      orDoesntHave(string $relation)
@@ -170,8 +171,8 @@ use ReflectionException;
  * @method static Processor    getProcessor()
  * @method static Grammar      getGrammar()
  * @method static $this        useWritePdo()
- * @method static cloneWithout(array $except)
- * @method static cloneWithoutBindings(array $except)
+ * @method static              cloneWithout(array $except)
+ * @method static              cloneWithoutBindings(array $except)
  * @method static void         macro($name, $macro)
  * @method static bool         hasMacro($name)
  * @method static mixed        macroCall($method, $parameters)
@@ -181,6 +182,7 @@ use ReflectionException;
  *
  * @mixin Eloquent
  * @mixin Builder
+ * @mixin EloquentBuilder
  */
 abstract class DataModel extends Model implements Authorizable
 {
@@ -216,10 +218,10 @@ abstract class DataModel extends Model implements Authorizable
 
     public const TABLE = null;
 
-    static public $rules               = [];
-    static public $calculated          = [];
-    static public $api_relations       = [];
-    static public $authorization_paths = [];
+    public static array $rules               = [];
+    public static array $calculated          = [];
+    public static array $api_relations       = [];
+    public static array $authorization_paths = [];
 
     protected $table = self::TABLE;
 
@@ -228,7 +230,7 @@ abstract class DataModel extends Model implements Authorizable
      *
      * @var array
      */
-    protected $hidden = [
+    protected array $hidden = [
         'deleted_at',
         'laravel_through_key',
         'pivot',
@@ -239,9 +241,9 @@ abstract class DataModel extends Model implements Authorizable
      *
      * @var string
      */
-    protected $keyType = 'string';
+    protected string $keyType = 'string';
 
-    public $protected_properties = [];
+    public array $protected_properties = [];
 
     /**
      * @param string $key

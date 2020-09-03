@@ -2,7 +2,7 @@
 
 namespace LumenToolkit\Exceptions;
 
-use LumenToolkit\Helpers\HttpStatus;
+use LumenToolkit\Http\Status;
 use LumenToolkit\Http\Controllers\ExceptionController;
 use Exception;
 use Throwable;
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
@@ -32,8 +32,6 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         AuthorizationException::class,
         HttpException::class,
-        ModelNotFoundException::class,
-        ValidationException::class,
     ];
 
     /**
@@ -41,7 +39,7 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Throwable $e
+     * @param  Throwable $e
      *
      * @return void
      * @throws Exception
@@ -54,64 +52,72 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  Request    $request
-     * @param  \Exception $e
+     * @param Request   $request
+     * @param Throwable $e
      *
      * @return Response
+     * @throws Throwable
      */
     public function render($request, Throwable $e)
     {
         $render = null;
         if ($e instanceof ModelNotFoundException) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception($e->getMessage() . ' Model not found'));
+            $e = new \Exception($e->getMessage() . ' Model not found', Status::INTERNAL_SERVER_ERROR);
+            return $exception_controller->render($request, $e);
+
         }
 
         if ($e instanceof NotFoundHttpException
-            || $e->getCode() == HttpStatus::NOT_FOUND
+            || $e->getCode() == Status::NOT_FOUND
         ) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception('Not Found', HttpStatus::NOT_FOUND));
+            $e = new \Exception('Not Found', Status::NOT_FOUND);
+            return $exception_controller->render($request, $e);
+        }
+
+        if ($e instanceof ValidationException) {
+            $exception_controller = new ExceptionController();
+            $e = new \Exception('Validation issue: ' . $e->getMessage(), Status::BAD_REQUEST);
+            return $exception_controller->render($request, $e);
         }
 
         if ($e instanceof ThrottleRequestsException) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception('Too Many Requests', HttpStatus::TOO_MANY_REQUESTS));
+            $e = new \Exception('Too Many Requests', Status::TOO_MANY_REQUESTS);
+            return $exception_controller->render($request, $e);
         }
 
         if ($e instanceof DecryptException) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception("Decryption issue: " . $e->getMessage(), HttpStatus::INTERNAL_SERVER_ERROR));
+            $e = new \Exception("Decryption issue: " . $e->getMessage(), Status::INTERNAL_SERVER_ERROR);
+            return $exception_controller->render($request, $e);
         }
 
         if ($e instanceof AuthenticationException
             || $e instanceof UnauthorizedException
         ) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception(trim('Unauthorized ' . $e->getMessage()), HttpStatus::UNAUTHORIZED));
+            $e = new \Exception(trim('Unauthorized ' . $e->getMessage()), Status::UNAUTHORIZED);
+            return $exception_controller->render($request, $e);
         }
 
         if ($e instanceof BadRequestHttpException) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception('Bad Request', HttpStatus::BAD_REQUEST));
+            $e = new \Exception('Bad Request',Status::BAD_REQUEST);
+            return $exception_controller->render($request, $e);
         }
 
         if ($e instanceof MethodNotAllowedHttpException) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception('Method Not Allowed', HttpStatus::METHOD_NOT_ALLOWED));
+            $e = new \Exception('Method Not Allowed', Status::METHOD_NOT_ALLOWED);
+            return $exception_controller->render($request, $e);
         }
 
         if ($e instanceof ReflectionException) {
             $exception_controller = new ExceptionController();
-            return $exception_controller->render($request,
-                                                 new \Exception('Internal Server Error: ' . $e->getMessage(), HttpStatus::INTERNAL_SERVER_ERROR));
+            $e = new \Exception('Internal Server Error: ' . $e->getMessage(), Status::INTERNAL_SERVER_ERROR);
+            return $exception_controller->render($request, $e);
         }
 
         return parent::render($request, $e);
